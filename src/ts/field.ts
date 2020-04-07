@@ -1,10 +1,16 @@
+import {addSteps} from './features';
+import {getTime, getSteps} from './features';
+
 function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-let selected: HTMLElement | null = null;
 let dragSrcEl: HTMLElement | null = null;
 const cellArr: HTMLElement[] = [];
+
+export function getCellArr(): HTMLElement[] {
+    return cellArr;
+}
 
 function checkResult(arr: HTMLElement[]): void {
   const result = arr.every((elem, i) => {
@@ -13,25 +19,27 @@ function checkResult(arr: HTMLElement[]): void {
     }
     return  elem.textContent === i + 1 + '';
   });
-  console.log(result);
+  if (result) {
+    alert(`Ура! Вы решили головоломку за ${getTime()} и ${getSteps()} ходов`);
+  }
 }
 
 function handleDragStart(e: DragEvent): void {
-  if (this.textContent === '') {
+  if ((e.target as HTMLElement).textContent === '') {
     return;
   }
-  this.classList.add('drag');
-  dragSrcEl = this;
+  (e.target as HTMLElement).classList.add('drag');
+  dragSrcEl = (e.target as HTMLElement);
 
   e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/html', this.innerHTML);
+  e.dataTransfer.setData('text/html', dragSrcEl.innerHTML);
 }
 
 function handleDragOver(e: DragEvent): boolean {
   if (e.preventDefault) {
     e.preventDefault();
   }
-  if (this.textContent === '') {
+  if ((e.target as HTMLElement).textContent === '') {
     e.dataTransfer.dropEffect = 'move';
   } else {
     e.dataTransfer.dropEffect = 'none';
@@ -39,46 +47,30 @@ function handleDragOver(e: DragEvent): boolean {
   return false;
 }
 
-function handleDragEnter(): void {
-  if (this.textContent === '') {
-    selected = this;
-    this.classList.add('over');
-  }
-}
-
-function handleDragLeave(): void {
-  if (selected) {
-    selected = null;
-    this.classList.remove('over');
-  }
-}
-
 function handleDrop(e: DragEvent): boolean {
   if (e.stopPropagation) {
     e.stopPropagation();
   }
-  if (dragSrcEl != this) {
-    dragSrcEl.innerHTML = this.innerHTML;
-    this.innerHTML = e.dataTransfer.getData('text/html');
+  if (dragSrcEl !== e.target) {
+    dragSrcEl.innerHTML = (e.target as HTMLElement).innerHTML;
+    (e.target as HTMLElement).innerHTML = e.dataTransfer.getData('text/html');
   }
   return false;
 }
 
-function handleDragEnd(): void {
-  if (selected) {
-    selected.classList.remove('over');
-  }
-  this.classList.remove('drag');
+function handleDragEnd(e): void {
+  e.target.classList.remove('drag');
   checkResult(cellArr);
+  addSteps(1);
 }
 
-function addHandlers() {
-
-}
-
-export default (size: number): HTMLElement => {
+export function createField (size: number): HTMLElement {
   const field = document.createElement('div');
   field.classList.add('game__field');
+  field.addEventListener('dragstart', handleDragStart);
+  field.addEventListener('dragover', handleDragOver);
+  field.addEventListener('drop', handleDrop);
+  field.addEventListener('dragend', handleDragEnd);
   const numberSet = new Set();
   while (numberSet.size !== size**2) {
     numberSet.add(getRandomInt(0, size**2) + '');
@@ -91,13 +83,7 @@ export default (size: number): HTMLElement => {
       const elem = document.createElement('div');
       cellArr.push(elem);
       elem.classList.add('game__field__cell', `m_${size}`);
-      elem.setAttribute('draggable', 'false');
-      elem.addEventListener('dragstart', handleDragStart);
-      elem.addEventListener('dragenter', handleDragEnter);
-      elem.addEventListener('dragover', handleDragOver);
-      elem.addEventListener('dragleave', handleDragLeave);
-      elem.addEventListener('drop', handleDrop);
-      elem.addEventListener('dragend', handleDragEnd);
+      // elem.setAttribute('draggable', 'true');
       if (numberArr[i] !== '0') {
         elem.append(numberArr[i]);
       }

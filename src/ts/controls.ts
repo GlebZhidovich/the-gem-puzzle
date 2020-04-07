@@ -1,5 +1,10 @@
 export default (): HTMLElement => {
-  const controls = document.createElement('div');
+  const [allControls, controls, sizeControls] = [
+    document.createElement('div'),
+    document.createElement('div'),
+    document.createElement('div')
+
+  ];
   controls.classList.add('game__panel__controls');
   const btnSetName = ['start', 'stop', 'save', 'result'];
   const btnSet = [
@@ -15,5 +20,8 @@ export default (): HTMLElement => {
   });
   const [startBtn, stopBtn, saveBtn, resultBtn] = btnSet;
   controls.append(startBtn, stopBtn, saveBtn, resultBtn);
-  return controls;
+
+  allControls.append(controls, sizeControls);
+  return allControls;
 };
+
