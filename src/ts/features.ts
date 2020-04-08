@@ -13,7 +13,7 @@ let data: Data = {
   min: 0,
   timer: null,
   steps: 0,
-  top10: [],
+  top10: [8, 10, 15, 50, 70],
   cellArr: null,
   cellArrNum: null
 };

@@ -1,30 +1,37 @@
 import createPanel from './panel';
-import {createField, addDragListener, addCells, randomNumbers, activeCells} from './field';
+import {activeCells, addCells, addDragListener, createField, randomNumbers} from './field';
 import {
-  timeCounter,
-  stopTimer,
-  setSteps,
-  setTime,
   getCellArr,
   getData,
-  getTimer,
+  getTimer, getTop,
   setCellArrNum,
-  setData
+  setData,
+  setSteps,
+  setTime,
+  stopTimer,
+  timeCounter
 } from './features';
 
 let timeDisplay;
 let curSize: number;
 let curField: HTMLElement;
+let isResult = false;
+let fieldWrap: HTMLElement;
 
 const actions = {
   'new game'(): void {
     setSteps(0);
     setTime(0, 0);
     curField.innerHTML = '';
+    console.log(curField);
     const arrNum = randomNumbers(curSize);
     addCells(curSize, curField, arrNum);
     timeCounter((timeDisplay as HTMLElement));
     activeCells(getCellArr(), true);
+    if (isResult) {
+      isResult = !isResult;
+      fieldWrap.append(curField);
+    }
   },
   'start/stop'(): void {
     if (getTimer()) {
@@ -33,6 +40,10 @@ const actions = {
     } else {
       activeCells(getCellArr(), true);
       timeCounter((timeDisplay as HTMLElement));
+      if (isResult) {
+        isResult = !isResult;
+        fieldWrap.append(curField);
+      }
     }
   },
   save() {
@@ -41,9 +52,35 @@ const actions = {
       localStorage.setItem('data', JSON.stringify(getData()));
       alert('You save game');
   },
+  result(): void {
+    if (!isResult) {
+      isResult = !isResult;
+      fieldWrap = document.querySelector('.game__field-wrap');
+      fieldWrap.innerHTML = '';
+      const top10 = getTop();
+      const topElem = document.createElement('div');
+      topElem.classList.add('game__result__list');
+      const title = document.createElement('span');
+      title.append('Top 10');
+      title.classList.add('game__result__title');
+      topElem.append(title);
+      top10.forEach((elem, i) => {
+        const item = document.createElement('div');
+        const [num, res] = [
+          document.createElement('span'),
+          document.createElement('span')
+        ];
+        num.append(`№ ${i + 1} - `);
+        res.append(elem + '');
+        item.append(num, res);
+        topElem.append(item);
+      });
+      fieldWrap.append(topElem);
+    }
+  },
   size(s): void {
     curSize = s;
-    this['start/stop']();
+    this['new game']();
   }
 };
 
@@ -56,8 +93,7 @@ function ready(): void {
   const game = document.createElement('section');
   game.classList.add('game');
   body.append(game);
-  const fieldSize = 4;
-  curSize = fieldSize;
+  curSize = 4;
   const [panel, field, fieldContainer] = [
     createPanel(),
     createField(),

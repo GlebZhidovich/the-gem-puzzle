@@ -6,7 +6,7 @@ import {
   getCellArr,
   setCellArr,
   addCellArr,
-  setCellArrNum, getCellArrNum
+  setCellArrNum, getCellArrNum, setTop, getTop
 } from './features';
 
 function getRandomInt(min: number, max: number): number {
@@ -19,6 +19,23 @@ export function activeCells(cells: HTMLElement[], is: boolean): void {
   cells.forEach(elem => elem.setAttribute('draggable', is + ''));
 }
 
+function compareNumbers(a: number, b: number): number {
+  return a - b;
+}
+
+function addResult(steps: number): void {
+  const newTop = getTop();
+  const index = newTop.findIndex(elem => steps > elem);
+  if (index === -1 && newTop.length > 10) {
+    return;
+  }
+  if (index !== -1 && newTop.length > 10) {
+    newTop[index] = steps;
+  }
+  newTop.push(steps);
+  setTop(newTop.sort(compareNumbers));
+}
+
 function checkResult(arr: HTMLElement[]): void {
   const result = arr.every((elem, i) => {
     if (arr.length - 1 === i) {
@@ -29,6 +46,7 @@ function checkResult(arr: HTMLElement[]): void {
   if (result) {
     stopTimer();
     activeCells(getCellArr(), false);
+    addResult(getSteps());
     alert(`Ура! Вы решили головоломку за ${getTime()} и ${getSteps()} ходов`);
   }
 }
