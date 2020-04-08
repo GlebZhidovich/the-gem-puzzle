@@ -12,6 +12,10 @@ export function getSteps(): number {
 }
 
 export function timeCounter(elem: HTMLElement): void {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
   timer = setInterval(() => {
       if (sec === 60) {
         sec = 0;

@@ -44,6 +44,7 @@ function ready(): void {
     createField(fieldSize),
     document.createElement('div')
   ];
+  fieldContainer.classList.add('game__field-wrap');
   curField = fieldContainer;
   fieldContainer.append(field);
   game.append(panel, fieldContainer);

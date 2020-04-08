@@ -84,10 +84,12 @@ export function createField (size: number): HTMLElement {
       cellArr.push(elem);
       elem.classList.add('game__field__cell', `m_${size}`);
       // elem.setAttribute('draggable', 'true');
-      if (numberArr[i] !== '0') {
-        elem.append(numberArr[i]);
-      }
       field.append(elem);
+      if (numberArr[i] === '0') {
+        continue;
+      }
+      elem.append(numberArr[i]);
+
   }
   return field;
-};
+}

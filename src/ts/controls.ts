@@ -7,20 +7,14 @@ export default (): HTMLElement => {
   ];
   controls.classList.add('game__panel__controls');
   const btnSetName = ['start', 'stop', 'save', 'result'];
-  const btnSet = [
-    document.createElement('button'),
-    document.createElement('button'),
-    document.createElement('button'),
-    document.createElement('button')
-  ];
-  btnSet.forEach((elem, i) => {
-    elem.classList.add('game__panel__controls-btn');
-    elem.append(btnSetName[i]);
-    elem.setAttribute('data-btn', btnSetName[i]);
+  btnSetName.forEach((elem, i) => {
+    const btn = document.createElement('button');
+    btn.classList.add('game__panel__controls-btn');
+    btn.append(btnSetName[i]);
+    btn.setAttribute('data-btn', btnSetName[i]);
+    controls.append(btn);
   });
-  const [startBtn, stopBtn, saveBtn, resultBtn] = btnSet;
-  controls.append(startBtn, stopBtn, saveBtn, resultBtn);
-
+  allControls.classList.add('game__panel__all-controls-btn');
   allControls.append(controls, sizeControls);
   return allControls;
 };
