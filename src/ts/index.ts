@@ -1,10 +1,10 @@
 import createPanel from './panel';
 import {activeCells, addCells, addDragListener, createField, randomNumbers} from './field';
 import {
-  getCellArr,
+  getCellArr, getCurSize,
   getData,
   getTimer, getTop,
-  setCellArrNum,
+  setCellArrNum, setCurSize,
   setData,
   setSteps,
   setTime,
@@ -13,40 +13,48 @@ import {
 } from './features';
 
 let timeDisplay;
-let curSize: number;
 let curField: HTMLElement;
 let isResult = false;
 let fieldWrap: HTMLElement;
+let isGameStart = false;
+
+export function getGameStart(): boolean{
+  return isGameStart;
+}
 
 const actions = {
   'new game'(): void {
+    if (isResult) {
+      isResult = !isResult;
+      fieldWrap.innerHTML = '';
+      fieldWrap.append(curField);
+    }
+    isGameStart = true;
     setSteps(0);
     setTime(0, 0);
     curField.innerHTML = '';
-    console.log(curField);
-    const arrNum = randomNumbers(curSize);
-    addCells(curSize, curField, arrNum);
+    const arrNum = randomNumbers(getCurSize());
+    addCells(getCurSize(), curField, arrNum);
     timeCounter((timeDisplay as HTMLElement));
     activeCells(getCellArr(), true);
-    if (isResult) {
-      isResult = !isResult;
-      fieldWrap.append(curField);
-    }
   },
   'start/stop'(): void {
     if (getTimer()) {
+      isGameStart = false;
       activeCells(getCellArr(), false);
       stopTimer();
     } else {
-      activeCells(getCellArr(), true);
-      timeCounter((timeDisplay as HTMLElement));
       if (isResult) {
         isResult = !isResult;
+        fieldWrap.innerHTML = '';
         fieldWrap.append(curField);
       }
+      isGameStart = true;
+      activeCells(getCellArr(), true);
+      timeCounter((timeDisplay as HTMLElement));
     }
   },
-  save() {
+  save(): void {
       this['start/stop']();
       setCellArrNum(getCellArr());
       localStorage.setItem('data', JSON.stringify(getData()));
@@ -55,6 +63,7 @@ const actions = {
   result(): void {
     if (!isResult) {
       isResult = !isResult;
+      stopTimer();
       fieldWrap = document.querySelector('.game__field-wrap');
       fieldWrap.innerHTML = '';
       const top10 = getTop();
@@ -79,7 +88,7 @@ const actions = {
     }
   },
   size(s): void {
-    curSize = s;
+    setCurSize(s);
     this['new game']();
   }
 };
@@ -89,18 +98,18 @@ function ready(): void {
     const data = JSON.parse(localStorage.getItem('data'));
     setData(data);
   }
+
   const body = document.body;
   const game = document.createElement('section');
   game.classList.add('game');
   body.append(game);
-  curSize = 4;
   const [panel, field, fieldContainer] = [
     createPanel(),
     createField(),
     document.createElement('div')
   ];
-  const arrNum = randomNumbers(curSize);
-  addCells(curSize,field, arrNum);
+  const arrNum = randomNumbers(getCurSize());
+  addCells(getCurSize(),field, arrNum);
   fieldContainer.classList.add('game__field-wrap');
   curField = field;
   addDragListener(field);

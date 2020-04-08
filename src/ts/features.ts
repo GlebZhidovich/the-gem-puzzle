@@ -6,6 +6,7 @@ interface Data {
   top10: number[];
   cellArr: HTMLElement[];
   cellArrNum: string[];
+  curSize: number;
 }
 
 let data: Data = {
@@ -15,8 +16,17 @@ let data: Data = {
   steps: 0,
   top10: [8, 10, 15, 50, 70],
   cellArr: null,
-  cellArrNum: null
+  cellArrNum: null,
+  curSize: 4
 };
+
+export function getCurSize(): number{
+  return data.curSize;
+}
+
+export function setCurSize(num: number): void{
+  data.curSize = num;
+}
 
 export function getTimer(): null | any {
   return data.timer;
@@ -51,7 +61,12 @@ export function setCellArrNum(elem: HTMLElement[] | null): void {
     data.cellArrNum = null;
     return;
   }
-  data.cellArrNum = elem.map(elem => elem.textContent);
+  data.cellArrNum = elem.map(elem => {
+    if (elem.textContent === '') {
+      return '0';
+    }
+    return elem.textContent;
+  });
 }
 
 export function getTop(): number[] {

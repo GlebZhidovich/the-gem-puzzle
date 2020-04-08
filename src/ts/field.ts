@@ -6,8 +6,9 @@ import {
   getCellArr,
   setCellArr,
   addCellArr,
-  setCellArrNum, getCellArrNum, setTop, getTop
+  setCellArrNum, getCellArrNum, setTop, getTop, getCurSize
 } from './features';
+import {getGameStart} from './index';
 
 function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -62,11 +63,26 @@ function handleDragStart(e: DragEvent): void {
   e.dataTransfer.setData('text/html', dragSrcEl.innerHTML);
 }
 
+function isSwap(elem1: HTMLElement, elem2: HTMLElement): boolean {
+  const selectedIdx = getCellArr().findIndex(elem => elem === elem2);
+  const curIdx = getCellArr().findIndex(elem => elem === elem1);
+
+  return curIdx !== -1 && elem1.textContent === '' &&
+    (
+      (
+        Math.abs(curIdx - selectedIdx) == 1
+      ) || (
+      Math.abs(curIdx - selectedIdx) == getCurSize()
+      )
+    );
+}
+
 function handleDragOver(e: DragEvent): boolean {
   if (e.preventDefault) {
     e.preventDefault();
   }
-  if ((e.target as HTMLElement).textContent === '') {
+
+  if (isSwap((e.target as HTMLElement), dragSrcEl)) {
     e.dataTransfer.dropEffect = 'move';
   } else {
     e.dataTransfer.dropEffect = 'none';
@@ -80,6 +96,8 @@ function handleDrop(e: DragEvent): boolean {
   }
   if (dragSrcEl !== e.target) {
     dragSrcEl.innerHTML = (e.target as HTMLElement).innerHTML;
+    dragSrcEl.classList.toggle('over');
+    (e.target as HTMLElement).classList.toggle('over');
     (e.target as HTMLElement).innerHTML = e.dataTransfer.getData('text/html');
   }
   return false;
@@ -91,11 +109,28 @@ function handleDragEnd(e): void {
   addSteps(1);
 }
 
+function swapElem(e): void {
+  if (e.target.classList.contains('game__field__cell') && getGameStart()) {
+    const newArr = getCellArr();
+    const selectedIdx = newArr.findIndex(elem => elem.textContent === '');
+    const curIdx = newArr.findIndex(elem => elem === (e.target as HTMLElement));
+    if (isSwap(newArr[selectedIdx], newArr[curIdx])) {
+      const newElem = newArr[selectedIdx].innerHTML;
+      newArr[selectedIdx].classList.add('move');
+      newArr[selectedIdx].classList.toggle('over');
+      newArr[curIdx].classList.toggle('over');
+      newArr[selectedIdx].innerHTML = newArr[curIdx].innerHTML;
+      newArr[curIdx].innerHTML = newElem;
+    }
+  }
+}
+
 export function addDragListener(elem: HTMLElement): void {
   elem.addEventListener('dragstart', handleDragStart);
   elem.addEventListener('dragover', handleDragOver);
   elem.addEventListener('drop', handleDrop);
   elem.addEventListener('dragend', handleDragEnd);
+  elem.addEventListener('click', swapElem);
 }
 
 export function addCells(size: number, field: HTMLElement, numArr: string[]): void {
@@ -110,7 +145,8 @@ export function addCells(size: number, field: HTMLElement, numArr: string[]): vo
     addCellArr(elem);
     elem.classList.add('game__field__cell', `m_${size}`);
     field.append(elem);
-    if (newNumArr[i] === '0') {
+    if (newNumArr[i] === '0' || newNumArr[i] === '') {
+      elem.classList.add('over');
       continue;
     }
     elem.append(newNumArr[i]);
