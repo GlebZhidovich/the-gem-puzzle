@@ -1,4 +1,5 @@
 import createControls from './controls';
+import {getSteps, getTime} from './features';
 
 export default (): HTMLElement => {
   const [panel, timer, steps, time, stepStart, timeStart] = [
@@ -16,8 +17,8 @@ export default (): HTMLElement => {
   time.classList.add('game__panel__time');
   stepStart.classList.add('game__panel__steps-num');
   timeStart.classList.add('game__panel__time-num');
-  stepStart.append('0');
-  timeStart.append('00:00');
+  stepStart.append(getSteps() + '');
+  timeStart.append(getTime());
   steps.append('Steps: ', stepStart);
   time.append('Time: ', timeStart);
   const controls: HTMLElement = createControls();

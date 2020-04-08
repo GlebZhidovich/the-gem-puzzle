@@ -1,15 +1,22 @@
-import {addSteps} from './features';
-import {getTime, getSteps} from './features';
+import {
+  getTime,
+  getSteps,
+  stopTimer,
+  addSteps,
+  getCellArr,
+  setCellArr,
+  addCellArr,
+  setCellArrNum, getCellArrNum
+} from './features';
 
 function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
 let dragSrcEl: HTMLElement | null = null;
-const cellArr: HTMLElement[] = [];
 
-export function getCellArr(): HTMLElement[] {
-    return cellArr;
+export function activeCells(cells: HTMLElement[], is: boolean): void {
+  cells.forEach(elem => elem.setAttribute('draggable', is + ''));
 }
 
 function checkResult(arr: HTMLElement[]): void {
@@ -20,6 +27,8 @@ function checkResult(arr: HTMLElement[]): void {
     return  elem.textContent === i + 1 + '';
   });
   if (result) {
+    stopTimer();
+    activeCells(getCellArr(), false);
     alert(`Ура! Вы решили головоломку за ${getTime()} и ${getSteps()} ходов`);
   }
 }
@@ -60,7 +69,7 @@ function handleDrop(e: DragEvent): boolean {
 
 function handleDragEnd(e): void {
   e.target.classList.remove('drag');
-  checkResult(cellArr);
+  checkResult(getCellArr());
   addSteps(1);
 }
 
@@ -72,16 +81,21 @@ export function addDragListener(elem: HTMLElement): void {
 }
 
 export function addCells(size: number, field: HTMLElement, numArr: string[]): void {
+  let newNumArr = numArr;
+  if (getCellArrNum()) {
+    newNumArr = getCellArrNum();
+    setCellArrNum(null);
+  }
+  setCellArr([]);
   for (let i = 0; i < size**2; i++) {
     const elem = document.createElement('div');
-    cellArr.push(elem);
+    addCellArr(elem);
     elem.classList.add('game__field__cell', `m_${size}`);
-    // elem.setAttribute('draggable', 'true');
     field.append(elem);
-    if (numArr[i] === '0') {
+    if (newNumArr[i] === '0') {
       continue;
     }
-    elem.append(numArr[i]);
+    elem.append(newNumArr[i]);
   }
 }
 
@@ -95,7 +109,7 @@ export function randomNumbers(size: number): string[] {
   return Array.from(numberSet);
 }
 
-export function createField (size: number): HTMLElement {
+export function createField (): HTMLElement {
   const field = document.createElement('div');
   field.classList.add('game__field');
   return field;

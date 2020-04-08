@@ -6,7 +6,7 @@ export default (): HTMLElement => {
 
   ];
   controls.classList.add('game__panel__controls');
-  const btnSetName = ['start', 'stop', 'save', 'result'];
+  const btnSetName = ['new game', 'start/stop', 'save', 'result'];
 
   btnSetName.forEach(elem => {
     const btn = document.createElement('button');

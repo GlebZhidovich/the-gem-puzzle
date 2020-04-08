@@ -1,18 +1,23 @@
 import createPanel from './panel';
-import {createField, getCellArr, addDragListener, addCells, randomNumbers} from './field';
-import {timeCounter, stopTimer, setSteps, setTime} from './features';
+import {createField, addDragListener, addCells, randomNumbers, activeCells} from './field';
+import {
+  timeCounter,
+  stopTimer,
+  setSteps,
+  setTime,
+  getCellArr,
+  getData,
+  getTimer,
+  setCellArrNum,
+  setData
+} from './features';
 
 let timeDisplay;
 let curSize: number;
 let curField: HTMLElement;
-let isStop = false;
-
-function activeCells(cells: HTMLElement[], is: boolean): void {
-    cells.forEach(elem => elem.setAttribute('draggable', is + ''));
-}
 
 const actions = {
-  start(): void {
+  'new game'(): void {
     setSteps(0);
     setTime(0, 0);
     curField.innerHTML = '';
@@ -21,24 +26,32 @@ const actions = {
     timeCounter((timeDisplay as HTMLElement));
     activeCells(getCellArr(), true);
   },
-  stop(): void {
-    if (!isStop) {
-      isStop = !isStop;
+  'start/stop'(): void {
+    if (getTimer()) {
       activeCells(getCellArr(), false);
       stopTimer();
     } else {
-      isStop = !isStop;
       activeCells(getCellArr(), true);
       timeCounter((timeDisplay as HTMLElement));
     }
   },
+  save() {
+      this['start/stop']();
+      setCellArrNum(getCellArr());
+      localStorage.setItem('data', JSON.stringify(getData()));
+      alert('You save game');
+  },
   size(s): void {
     curSize = s;
-    this.start();
+    this['start/stop']();
   }
 };
 
 function ready(): void {
+  if (localStorage.getItem('data')) {
+    const data = JSON.parse(localStorage.getItem('data'));
+    setData(data);
+  }
   const body = document.body;
   const game = document.createElement('section');
   game.classList.add('game');
@@ -47,7 +60,7 @@ function ready(): void {
   curSize = fieldSize;
   const [panel, field, fieldContainer] = [
     createPanel(),
-    createField(fieldSize),
+    createField(),
     document.createElement('div')
   ];
   const arrNum = randomNumbers(curSize);
@@ -58,15 +71,15 @@ function ready(): void {
   fieldContainer.append(field);
   game.append(panel, fieldContainer);
 
-
   function actionsHandler(e): void {
     if (e.target.dataset['btn']) {
       const action = e.target.dataset['btn'];
-      actions[action]();
+      if (actions[action]) {
+        actions[action]();
+      }
     }
     if (e.target.dataset['size']) {
       const cellSize = e.target.dataset['size'];
-      console.log(cellSize);
       actions['size'](cellSize);
     }
   }
