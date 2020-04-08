@@ -64,32 +64,39 @@ function handleDragEnd(e): void {
   addSteps(1);
 }
 
-export function createField (size: number): HTMLElement {
-  const field = document.createElement('div');
-  field.classList.add('game__field');
-  field.addEventListener('dragstart', handleDragStart);
-  field.addEventListener('dragover', handleDragOver);
-  field.addEventListener('drop', handleDrop);
-  field.addEventListener('dragend', handleDragEnd);
+export function addDragListener(elem: HTMLElement): void {
+  elem.addEventListener('dragstart', handleDragStart);
+  elem.addEventListener('dragover', handleDragOver);
+  elem.addEventListener('drop', handleDrop);
+  elem.addEventListener('dragend', handleDragEnd);
+}
+
+export function addCells(size: number, field: HTMLElement, numArr: string[]): void {
+  for (let i = 0; i < size**2; i++) {
+    const elem = document.createElement('div');
+    cellArr.push(elem);
+    elem.classList.add('game__field__cell', `m_${size}`);
+    // elem.setAttribute('draggable', 'true');
+    field.append(elem);
+    if (numArr[i] === '0') {
+      continue;
+    }
+    elem.append(numArr[i]);
+  }
+}
+
+export function randomNumbers(size: number): string[] {
   const numberSet = new Set();
   while (numberSet.size !== size**2) {
     numberSet.add(getRandomInt(0, size**2) + '');
   }
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore
-  const numberArr: string[] = Array.from(numberSet);
+  return Array.from(numberSet);
+}
 
-  for (let i = 0; i < size**2; i++) {
-      const elem = document.createElement('div');
-      cellArr.push(elem);
-      elem.classList.add('game__field__cell', `m_${size}`);
-      // elem.setAttribute('draggable', 'true');
-      field.append(elem);
-      if (numberArr[i] === '0') {
-        continue;
-      }
-      elem.append(numberArr[i]);
-
-  }
+export function createField (size: number): HTMLElement {
+  const field = document.createElement('div');
+  field.classList.add('game__field');
   return field;
 }

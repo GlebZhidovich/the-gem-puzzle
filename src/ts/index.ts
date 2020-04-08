@@ -1,6 +1,6 @@
 import createPanel from './panel';
-import {createField, getCellArr} from './field';
-import {timeCounter, stopTimer} from './features';
+import {createField, getCellArr, addDragListener, addCells, randomNumbers} from './field';
+import {timeCounter, stopTimer, setSteps, setTime} from './features';
 
 let timeDisplay;
 let curSize: number;
@@ -13,8 +13,11 @@ function activeCells(cells: HTMLElement[], is: boolean): void {
 
 const actions = {
   start(): void {
+    setSteps(0);
+    setTime(0, 0);
     curField.innerHTML = '';
-    curField.append(createField(curSize));
+    const arrNum = randomNumbers(curSize);
+    addCells(curSize, curField, arrNum);
     timeCounter((timeDisplay as HTMLElement));
     activeCells(getCellArr(), true);
   },
@@ -28,7 +31,10 @@ const actions = {
       activeCells(getCellArr(), true);
       timeCounter((timeDisplay as HTMLElement));
     }
-
+  },
+  size(s): void {
+    curSize = s;
+    this.start();
   }
 };
 
@@ -44,8 +50,11 @@ function ready(): void {
     createField(fieldSize),
     document.createElement('div')
   ];
+  const arrNum = randomNumbers(curSize);
+  addCells(curSize,field, arrNum);
   fieldContainer.classList.add('game__field-wrap');
-  curField = fieldContainer;
+  curField = field;
+  addDragListener(field);
   fieldContainer.append(field);
   game.append(panel, fieldContainer);
 
@@ -55,9 +64,14 @@ function ready(): void {
       const action = e.target.dataset['btn'];
       actions[action]();
     }
+    if (e.target.dataset['size']) {
+      const cellSize = e.target.dataset['size'];
+      console.log(cellSize);
+      actions['size'](cellSize);
+    }
   }
 
-  const panelControls = document.querySelector('.game__panel__controls');
+  const panelControls = document.querySelector('.game__panel__all-controls-btn');
   panelControls.addEventListener('click', actionsHandler);
   timeDisplay = document.querySelector('.game__panel__time-num');
 }

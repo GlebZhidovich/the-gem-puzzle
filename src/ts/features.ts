@@ -7,14 +7,22 @@ export function getTime(): string {
     return `${min < 10 ? '0' + min : min}:${sec < 10 ?  '0' + sec : sec}`;
 }
 
+export function setTime(s: number, m: number): void {
+    sec = s; min = m;
+}
+
 export function getSteps(): number {
     return steps;
 }
 
+export function stopTimer(): void {
+  clearInterval(timer);
+  timer = null;
+}
+
 export function timeCounter(elem: HTMLElement): void {
   if (timer) {
-    clearInterval(timer);
-    timer = null;
+    stopTimer();
   }
   timer = setInterval(() => {
       if (sec === 60) {
@@ -24,10 +32,6 @@ export function timeCounter(elem: HTMLElement): void {
       sec += 1;
       elem.innerHTML = `${min < 10 ? '0' + min : min}:${sec < 10 ?  '0' + sec : sec}`;
     }, 1000);
-}
-
-export function stopTimer(): void {
-    clearInterval(timer);
 }
 
 function displaySteps(num: number): void {
@@ -42,5 +46,6 @@ export function addSteps(num: number): void {
 
 export function setSteps(num: number): void {
   steps = num;
+  displaySteps(steps);
 }
 

@@ -40,6 +40,10 @@ body {
     &__controls {
       text-align: center;
 
+      &-size {
+        text-align: center;
+      }
+
       &-btn {
         margin: 5px;
         padding: 10px;
@@ -51,6 +55,10 @@ body {
         background: #1d1d1d;
         text-transform: uppercase;
         user-select: none;
+      }
+
+      &-btn:hover {
+        background: #e7346a;
       }
     }
   }
