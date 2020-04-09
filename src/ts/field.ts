@@ -121,6 +121,7 @@ function swapElem(e): void {
       newArr[curIdx].classList.toggle('over');
       newArr[selectedIdx].innerHTML = newArr[curIdx].innerHTML;
       newArr[curIdx].innerHTML = newElem;
+      addSteps(1);
     }
   }
 }
