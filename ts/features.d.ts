@@ -1,0 +1,30 @@
+interface Data {
+    sec: number;
+    min: number;
+    timer: null | any;
+    steps: number;
+    top10: number[];
+    cellArr: HTMLElement[];
+    cellArrNum: string[];
+    curSize: number;
+}
+export declare function getCurSize(): number;
+export declare function setCurSize(num: number): void;
+export declare function getTimer(): null | any;
+export declare function getData(): Data;
+export declare function setData(obj: Data): void;
+export declare function getCellArr(): HTMLElement[];
+export declare function addCellArr(elem: HTMLElement): void;
+export declare function setCellArr(arr: HTMLElement[]): void;
+export declare function getCellArrNum(): string[];
+export declare function setCellArrNum(elem: HTMLElement[] | null): void;
+export declare function getTop(): number[];
+export declare function setTop(arr: number[]): void;
+export declare function getTime(): string;
+export declare function setTime(s: number, m: number): void;
+export declare function getSteps(): number;
+export declare function stopTimer(): void;
+export declare function timeCounter(elem: HTMLElement): void;
+export declare function addSteps(num: number): void;
+export declare function setSteps(num: number): void;
+export {};
