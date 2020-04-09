@@ -25,13 +25,16 @@ function compareNumbers(a: number, b: number): number {
 }
 
 function addResult(steps: number): void {
-  const newTop = getTop();
-  const index = newTop.findIndex(elem => steps > elem);
+  let newTop = getTop();
+  const index = newTop.findIndex(elem => steps < elem);
   if (index === -1 && newTop.length > 10) {
     return;
   }
   if (index !== -1 && newTop.length > 10) {
     newTop[index] = steps;
+  }
+  if (index !== -1 && newTop.length < 10) {
+    newTop = [...newTop.slice(0, index), steps, ...newTop.slice(index)];
   }
   newTop.push(steps);
   setTop(newTop.sort(compareNumbers));
